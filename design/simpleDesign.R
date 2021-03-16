@@ -5,14 +5,36 @@ library(tidyverse)
 library(glue)
 
 
+
+#######################################################################################
+# use a inputs .csv file to read in labels of specific levels
+levels <- readr::read_csv("/Users/joshwhelan/repos/ConjointExample/design/inputs.csv")
+
+# grab attribute names and sizes
+labels <- names(levels[,2:ncol(levels)])
+size <- rep(NA, ncol(levels)-1)
+
+# build a vector of the sizes
+for (i in 2:ncol(levels)) {
+    varname <- names(levels[,i])
+    curLevels <- levels %>%
+        dplyr::select(1, all_of(i)) %>%
+        tidyr::drop_na()
+size[i-1] <- nrow(curLevels)
+}
+#######################################################################################
+
+
+
+
 #######################################################################################
 #######################################################################################
 # use this conjoint package for convenience to start
 library(conjointTools)
 
 doe <- conjointTools::makeDoe(
-	levels = c(2, 2, 2),
-	varNames = c("price", "type", "freshness")
+	levels = size,
+	varNames = labels
 )
 
 survey <- conjointTools::makeSurvey(
@@ -24,8 +46,8 @@ survey <- conjointTools::makeSurvey(
 
 results <- sampleSizer(
     survey   = survey,
-    parNames = c('price', 'type', 'freshness'),
-    parTypes = c('c', 'd', 'd'),     # Set continuous vs. discrete variables
+    parNames = labels,
+    parTypes = c('d', 'c', 'd', 'c', 'd', 'c'),     # Set continuous vs. discrete variables
     interactions = FALSE,             # Add interactions between each attribute
     nbreaks  = 10
 )

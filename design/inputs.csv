@@ -1,0 +1,5 @@
+code,burger,burgerPrice,side,sidePrice,drink,drinkPrice
+1,Hamburger,5.00,Fries,0.75,Pop,0.25
+2,Cheesburger,6.00,Salad,1.00,Beer,0.50
+3,Hot Dog,7.00,No Side,1.25,No Drink,0.75
+4,Chicken Tenders,,,1.50,,
