@@ -1,18 +1,31 @@
 
+
 rm(list=ls())
 
 library(tidyverse)
 library(glue)
+library(AlgDesign)
+library(choiceDes)
 
 
+outputPath <- ("/Users/joshwhelan/repos/ConjointExample/design")
+versCount <- 50
+screens <- 4
+alts <- 3
 
 #######################################################################################
 # use a inputs .csv file to read in labels of specific levels
-levels <- readr::read_csv("/Users/joshwhelan/repos/ConjointExample/design/inputs.csv")
+levels <- readr::read_csv(glue("{outputPath}/inputs.csv"))
+
 
 # grab attribute names and sizes
 labels <- names(levels[,2:ncol(levels)])
 size <- rep(NA, ncol(levels)-1)
+
+
+
+
+
 
 # build a vector of the sizes
 for (i in 2:ncol(levels)) {
@@ -23,6 +36,26 @@ for (i in 2:ncol(levels)) {
 size[i-1] <- nrow(curLevels)
 }
 #######################################################################################
+
+
+design <- dcm.design(size, versCount, screens, alts)
+
+
+des <- design$levels
+
+names(des[,4:ncol(des)]) <- labels
+
+## START HERE
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -66,8 +99,7 @@ design <- survey %>%
 	dplyr::select(-obsID)
 
 
-setwd("/Users/joshwhelan/repos/ConjointExample/design")
-write.csv(design, "doe.csv", row.names=FALSE)
+write.csv(design, glue("{outputPath}/design.csv"), row.names=FALSE)
 
 #######################################################################################
 #######################################################################################
