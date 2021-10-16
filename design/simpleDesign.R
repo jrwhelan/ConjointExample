@@ -42,6 +42,7 @@ design <- dcm.design(size, versCount, screens, alts)
 
 
 des <- design$levels
+row.names(des) <- NULL
 
 names(des[,4:ncol(des)]) <- labels
 
