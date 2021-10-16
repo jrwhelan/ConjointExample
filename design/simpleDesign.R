@@ -41,66 +41,16 @@ size[i-1] <- nrow(curLevels)
 design <- dcm.design(size, versCount, screens, alts)
 
 
-des <- design$levels
-row.names(des) <- NULL
+des <- design$levels %>%
+    dplyr::select(-card) %>%
+    dplyr::group_by(vers, task) %>%
+    dplyr::mutate(alt = 1:n()) %>%
+    dplyr::select(vers, task, alt, everything())
+#row.names(des) <- NULL
 
-names(des[,4:ncol(des)]) <- labels
+colnames(des) <- c("vers", "task", "alt", labels)
 
-## START HERE
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#######################################################################################
-#######################################################################################
-# use this conjoint package for convenience to start
-library(conjointTools)
-
-doe <- conjointTools::makeDoe(
-	levels = size,
-	varNames = labels
-)
-
-survey <- conjointTools::makeSurvey(
-    doe       = doe,  # Design of experiment
-    nResp     = 1000, # Total number of respondents (upper bound)
-    nAltsPerQ = 3,    # Number of alternatives per question
-    nQPerResp = 6     # Number of questions per respondent
-)
-
-results <- sampleSizer(
-    survey   = survey,
-    parNames = labels,
-    parTypes = c('d', 'c', 'd', 'c', 'd', 'c'),     # Set continuous vs. discrete variables
-    interactions = FALSE,             # Add interactions between each attribute
-    nbreaks  = 10
-)
-
-ggplot(results) +
-    geom_point(aes(x = size, y = se, color = coef),
-               fill = "white", pch = 21) +
-    scale_y_continuous(limits = c(0, NA)) +
-    labs(x = 'Number of observations',
-         y = 'Standard Error',
-         color = "Variable") +
-    theme_bw()
-
-design <- survey %>%
-	dplyr::rename(version = respID, task = qID, concept = altID) %>%
-	dplyr::select(-obsID)
-
-
-write.csv(design, glue("{outputPath}/design.csv"), row.names=FALSE)
+write.csv(des, glue("{outputPath}/design.csv"), row.names=FALSE)
 
 #######################################################################################
 #######################################################################################
